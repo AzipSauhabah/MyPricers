@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
@@ -34,6 +35,14 @@ if(UNIX)
         set(CMAKE_C_COMPILER "gcc")
         set(CMAKE_CXX_COMPILER "g++")
     endif()
+endif()
+
+if(APPLE)
+    # Replace /usr/local/bin/g++ with the full path to your g++ compiler
+    set(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
+else()
+    # Optionally set compiler for other platforms or leave it to default
+    # set(CMAKE_CXX_COMPILER "g++")
 endif()
 
 # Include Google Test
