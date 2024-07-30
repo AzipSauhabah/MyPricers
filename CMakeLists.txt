@@ -1,80 +1,67 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    set(CMAKE_OSX_SYSROOT "macosx14.5")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Mac Developer")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/Entitlements.plist")
+project(Foo LANGUAGES CXX)
+
+# Spécifier les options de la bibliothèque de temps d'exécution pour votre projet principal
+if(MSVC)
+    # Utiliser /MTd pour les configurations de type Debug
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+    # Utiliser /MT pour les configurations de type Release
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    set(CMAKE_OSX_SYSROOT "macosx14.5")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Mac Developer")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/Entitlements.plist")
+# Spécifier l'option /NODEFAULTLIB pour exclure la bibliothèque par défaut 'LIBCMTD'
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:LIBCMTD")
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:LIBCMTD")
+    set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:LIBCMTD")
 endif()
 
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set C and C++ compilers explicitly if not already set
-if(NOT CMAKE_C_COMPILER)
-    set(CMAKE_C_COMPILER "/usr/bin/clang")
-endif()
-if(NOT CMAKE_CXX_COMPILER)
-    set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-endif()
-
-# Verify that the specified compilers exist
-if(NOT EXISTS ${CMAKE_C_COMPILER})
-    message(FATAL_ERROR "Specified C compiler not found: ${CMAKE_C_COMPILER}")
-endif()
-if(NOT EXISTS ${CMAKE_CXX_COMPILER})
-    message(FATAL_ERROR "Specified C++ compiler not found: ${CMAKE_CXX_COMPILER}")
+if(UNIX)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_C_COMPILER "clang")
+        set(CMAKE_CXX_COMPILER "clang++")
+    else()
+        set(CMAKE_C_COMPILER "gcc")
+        set(CMAKE_CXX_COMPILER "g++")
+    endif()
 endif()
 
-# Project name and language
-project(Foo LANGUAGES CXX)
-
-# Specify the SDK to use
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    set(CMAKE_OSX_SYSROOT "macosx14.5")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Mac Developer")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
-    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "")
-endif()
+# Include Google Test
+enable_testing()
+add_subdirectory(libs/googletest-1.15.0)
+include_directories(${gtest_SOURCE_DIR}/include)
 
 # Source files
 set(FOO_SOURCE_DIR src)
 set(FOO_SOURCE ${FOO_SOURCE_DIR}/main.cpp)
 
-# Library directories and list of libraries
-set(FOO_LIBRARIES_DIR libs)
-set(FOO_LIBRARIES A B)
-
-# Include Google Test
-enable_testing()
-add_subdirectory(${FOO_LIBRARIES_DIR}/gtest-1.7.0)
-include_directories(${gtest_SOURCE_DIR}/include)
-
 # Define the executable
 add_executable(${PROJECT_NAME} ${FOO_SOURCE})
 
 # Add library directories and link libraries
+set(FOO_LIBRARIES A B)  # Replace with actual library names
 foreach(LIBRARY ${FOO_LIBRARIES})
-    add_subdirectory("${FOO_LIBRARIES_DIR}/${LIBRARY}")
+    add_subdirectory(libs/${LIBRARY})
+    target_link_libraries(${PROJECT_NAME} ${LIBRARY})
 endforeach()
-target_link_libraries(${PROJECT_NAME} ${FOO_LIBRARIES})
 
 # Platform-specific settings
 if (WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17")
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 elseif (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 elseif (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 endif()
 
 # Add include directories
