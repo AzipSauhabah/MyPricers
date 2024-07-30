@@ -39,7 +39,7 @@ endif()
 
 if(APPLE)
     # Replace /usr/local/bin/g++ with the full path to your g++ compiler
-    set(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
+    set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 else()
     # Optionally set compiler for other platforms or leave it to default
     # set(CMAKE_CXX_COMPILER "g++")
