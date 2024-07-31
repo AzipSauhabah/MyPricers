@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # MyPricers
 This is a pricer in. c++ multiplatform
 
@@ -104,13 +103,11 @@ To run CMake you need to go into Foo directory and do these steps:
 3. Run CMake to create XCode project `cmake -G Xcode ../`, but you can create any other project you want.
 4. Open XCode project `open Foo.xcodeproj`.
 
-<<<<<<< HEAD
-=======
 **NOTE**: 
 DO NOT make changes to generated project file, instead edit CMakeLists.txt files and regenerate project using CMake.
 For example, when you want to add files to project you update CMakeLists.txt to include those files and regenerate build system using CMake.
 
->>>>>>> ed03729 (initial commit)
+
 ## Copyright and license
 
 Code and documentation copyright 2024 Azip Sauhabah
